@@ -68,7 +68,7 @@ export default class PersonList extends React.Component {
     //         </div>
     //     );
 
-    // DELETE //
+    DELETE //
     state = {
         id: ""
     };
@@ -99,6 +99,9 @@ export default class PersonList extends React.Component {
                     <button type="submit">Delete</button>
                 </form>
             </div>
+
         );
     }
+
+
 }
