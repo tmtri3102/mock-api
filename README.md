@@ -1,40 +1,125 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Mock API
 
-## Getting Started
+## Endpoints
 
-First, run the development server:
+### 1. GET `/user/:userName`
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Lấy thông tin user.
+
+- **GET /user/peter** → `200`
+  ```json
+  { "id": 1, "userName": "peter", "age": "24" }
+  ```
+- **GET /user/unauthorised** → `403` `{}`
+- **GET /user/{USERNAME}** → `200`
+  ```json
+  { "id": 0, "userName": "{USERNAME}", "age": "20" }
+  ```
+
+### 2. POST `/user`
+
+Tạo user mới.
+
+- **Body hợp lệ** → `201`
+  ```json
+  { "id": 3, "userName": "goodBoy", "age": 35 }
+  ```
+- **ID đã tồn tại** → `409`
+  ```json
+  { "errorMessage": "UserId already exists" }
+  ```
+
+## Cấu trúc thư mục
+
+Dùng `connect-api-mocker` tạo API từ filesystem.
+
+### **GET /user/peter**
+
+```
+/mock-api/user/peter/GET.json
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```json
+{
+  "id": 1,
+  "userName": "peter",
+  "age": "24"
+}
+```
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+Truy cập: [localhost:9000/api/user/peter](http://localhost:9000/api/user/peter)
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+### **GET /user/unauthorised-user**
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+```
+/mock-api/user/unauthorised-user/GET.js
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```js
+module.exports = (req , res) => res.sendStatus ( 403 );
+```
 
-## Learn More
+Truy cập: [localhost:9000/api/user/unauthorised-user](http://localhost:9000/api/user/unauthorised-user)
 
-To learn more about Next.js, take a look at the following resources:
+### **GET /user/{USERNAME}**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+```
+/mock-api/user/__userName__/GET.js
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```js
+module.exports = (req , res) =>
+    res.status ( 200 ).json ( {id: 0 , userName: req.params.userName , age: 20} );
+```
 
-## Deploy on Vercel
+Truy cập: [localhost:9000/api/user/testtest](http://localhost:9000/api/user/testtest)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### **POST /user**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+```
+/mock-api/user/POST.js
+```
+
+```js
+module.exports = (req , res) => {
+    if (req.body.id === 1) return res.sendStatus ( 409 );
+    res.status ( 201 ).send ( req.body );
+};
+```
+
+Gửi request id=1:
+
+```sh
+curl -X POST -H "Content-Type: application/json" -d "{\"id\":1}" http://localhost:9000/api/user
+```
+
+```sh
+HTTP/1.1 409 Conflict
+X-Powered-By: Express
+Content-Type: text/plain; charset=utf-8
+Content-Length: 8
+ETag: W/"8-OfewgPiFJ3o3XA5wgKRYk2ZHNlU"
+Date: Mon, 03 Feb 2025 03:15:46 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+Conflict
+```
+
+Gửi request id=2:
+```sh
+curl -X POST -H "Content-Type: application/json" -d "{\"id\":2}" http://localhost:9000/api/user
+```
+
+```sh
+HTTP/1.1 201 Created
+X-Powered-By: Express
+Content-Type: application/json; charset=utf-8
+Content-Length: 8
+ETag: W/"8-M1u4Sc28uxk+zyXJvSTJaEkyIGw"
+Date: Mon, 03 Feb 2025 03:16:18 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"id":2}
+```
