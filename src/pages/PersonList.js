@@ -30,29 +30,62 @@ export default class PersonList extends React.Component {
     // }
 
     //  POST //
+    // state = {
+    //     name: ""
+    // };
+    //
+    // handleChange = event => {
+    //     this.setState({ name: event.target.value });
+    // };
+    //
+    // handleSubmit = event => {
+    //     event.preventDefault();
+    //
+    //     const user = {
+    //         name: this.state.name
+    //     };
+    //
+    //     axios
+    //         .post(`https://jsonplaceholder.typicode.com/users`, { user }) // wrap input in user object
+    //         .then(res => {
+    //             console.log("Response: ");
+    //             console.log(res);
+    //             console.log("response.data: ");
+    //             console.log(res.data); // name se nam trong user object
+    //         });
+    // };
+    //
+    // render() {
+    //     return (
+    //         <div>
+    //             <form onSubmit={this.handleSubmit}>
+    //                 <label>
+    //                     Person Name:
+    //                     <input type="text" name="name" onChange={this.handleChange} />
+    //                 </label>
+    //                 <button type="submit">Add</button>
+    //             </form>
+    //         </div>
+    //     );
+
+    // DELETE //
     state = {
-        name: ""
+        id: ""
     };
 
     handleChange = event => {
-        this.setState({ name: event.target.value });
+        this.setState ( {id: event.target.value} );
     };
 
     handleSubmit = event => {
-        event.preventDefault();
-
-        const user = {
-            name: this.state.name
-        };
+        event.preventDefault ();
 
         axios
-            .post(`https://jsonplaceholder.typicode.com/users`, { user }) // wrap input in user object
-            .then(res => {
-                console.log("Response: ");
-                console.log(res);
-                console.log("response.data: ");
-                console.log(res.data); // name se nam trong user object
-            });
+            .delete ( `https://jsonplaceholder.typicode.com/users/${this.state.id}` )
+            .then ( res => {
+                console.log ( res );
+                console.log ( res.data );
+            } );
     };
 
     render() {
@@ -60,10 +93,10 @@ export default class PersonList extends React.Component {
             <div>
                 <form onSubmit={this.handleSubmit}>
                     <label>
-                        Person Name:
-                        <input type="text" name="name" onChange={this.handleChange} />
+                        Person ID:
+                        <input type="text" name="id" onChange={this.handleChange}/>
                     </label>
-                    <button type="submit">Add</button>
+                    <button type="submit">Delete</button>
                 </form>
             </div>
         );
